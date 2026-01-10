@@ -138,6 +138,7 @@ resource "aws_security_group" "cus_sg" {
 resource "aws_instance" "ec2" {
     ami= "ami-068c0051b15cdb816"
     instance_type = "t3.micro"
+    key_name = "public"   # keyname is not manadate for testing purpose
     subnet_id = aws_subnet.subnet1.id
     vpc_security_group_ids = [aws_security_group.cus_sg.id]
     tags = {
@@ -149,6 +150,7 @@ resource "aws_instance" "ec2" {
 resource "aws_instance" "ec21" {
     ami= "ami-068c0051b15cdb816"
     instance_type = "t2.micro"
+    key_name = "public"   # keyname is not manadate for testing purpose
     subnet_id = aws_subnet.subnet2.id
     vpc_security_group_ids = [aws_security_group.cus_sg.id]
     tags = {
