@@ -5,3 +5,8 @@ resource "aws_instance" "name" {
     Name = "dynamoDB"
 }
 }
+
+resource "aws_s3_bucket" "name" {
+    bucket = "ahegfuiahsiodohadsjkfjklzs"
+  
+}
