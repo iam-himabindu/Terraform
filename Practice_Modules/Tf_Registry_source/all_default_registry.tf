@@ -20,7 +20,7 @@ module "ec2_instance" {
  # key_name      = "user1"
   subnet_id     = "subnet-07f141b89f70602d4"
   tags = {
-    Name:"server-best"
+    Name:"bastion-host"
   }
 }
 
