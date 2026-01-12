@@ -1,0 +1,7 @@
+module "dev" {
+    source = "../../Modules/Ec2_Template"
+    ami_id = "ami-01376101673c89611"
+    instance_type = "t2.micro"
+    #key = "public"
+  
+}
