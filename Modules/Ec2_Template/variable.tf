@@ -22,8 +22,4 @@ variable "key" {
   
 }
 
-variable "tags" {
-  type = string
-  default = ""
-  description = "Passing the values of tags"
-}
+variable "tags" {}
