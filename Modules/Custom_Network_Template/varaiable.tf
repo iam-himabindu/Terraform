@@ -3,15 +3,15 @@ variable "vpc_cidr" {
   type = string
 }
 
-variable "main_subnet" {
+variable "publicsubnet1" {
   type = string
 }
 
-variable "public_az1" {
+variable "publicsubnet2" {
   type = string
 }
 
-variable "public_az2" {
+variable "privatesubnet" {
   type = string
 }
 variable "availability_zone_1" {
@@ -33,10 +33,7 @@ variable "bastion_instance_type" {
 variable "private_instance_type" {
   type = string
 }
-
-variable "tags" {
-  type = map(string)
-}
+ 
 
 # -------------------------
 # RDS
@@ -53,8 +50,24 @@ variable "db_password" {
   type      = string
   sensitive = true
 }
-
+variable "identifier" {
+  
+}
 variable "instance_class" {
+  type    = string
+  default = ""
+}
+variable "backup_window" {
+  
+}
+variable "maintenance_window" {
+  
+}
+
+variable "replica_identifier" {
+  
+}
+variable "replica_instance_class" {
   type    = string
   default = ""
 }
@@ -71,11 +84,26 @@ variable "engine" {
 # -------------------------
 # S3
 # -------------------------
-variable "bucket_name" {
-  type = string
+variable "aws_s3_bucket" {
+  description = "S3 bucket name"
+  type        = string
 }
 
-variable "versioning_status" {
-  type    = string
-  default = ""
+variable "acl" {
+  description = "S3 bucket ACL"
+  type        = string
+  default     = ""
+}
+variable "aws_s3_bucket_ownership_controls" {
+  
+}
+
+variable "versioning" {
+  description = "Enable S3 versioning"
+  # type        = bool
+  # default     = ""
+}
+
+variable "tags" {
+  type = map(string)
 }
