@@ -647,3 +647,225 @@ Choosing the right meta-argument ensures:
 * Safer updates
 * Better long-term maintainability
 
+
+# Terraform `for_each`: A Simple Explanation with Examples
+
+## Scenario
+
+Congratulations! You recently joined an SRE team that uses Terraform to provision and manage infrastructure components. After some time, you notice that they configured a couple of similar infrastructure resources using the `count` meta-argument.
+
+```hcl
+# variables.tf
+variable "ami" {
+  type    = string
+  default = "ami-0078ef784b6fa1ba4"
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+}
+
+variable "sandboxes" {
+  type    = list(string)
+  default = ["sandbox_one", "sandbox_two", "sandbox_three"]
+}
+
+# main.tf
+resource "aws_instance" "sandbox" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  count         = length(var.sandboxes)
+
+  tags = {
+    Name = var.sandboxes[count.index]
+  }
+}
+```
+
+You identified inefficiencies and proposed using `for_each` instead of `count`.
+
+
+## Key Takeaways
+
+- `for_each` is commonly used to provision multiple similar infrastructure resources.
+- It prevents unintended remote object changes common with `count`.
+- `for_each` works with **sets** and **maps**.
+- `for_each` and `count` cannot be used together in the same block.
+
+
+## What Are Meta-Arguments in Terraform?
+
+Meta-arguments are special arguments used in `resource`, `data`, or `module` blocks to control how Terraform creates resources.
+
+By default, a resource block creates **one** infrastructure resource. Meta-arguments like `count` and `for_each` allow you to create **multiple** instances from a single block.
+
+
+## The Problem with the `count` Meta-Argument
+
+`count` relies on **list indexes**, which are ordered.
+
+Terraform state example:
+
+```
+aws_instance.sandbox[0]
+aws_instance.sandbox[1]
+aws_instance.sandbox[2]
+```
+
+If you remove an element from the middle of the list, Terraform may:
+- Destroy and recreate resources unnecessarily
+- Cause unintended infrastructure changes
+
+
+## Why `for_each` Was Introduced
+
+`for_each` works with **unordered collections** (sets or maps).  
+Resources are identified by **keys**, not numeric indexes, making Terraform plans safer and more predictable.
+
+
+## Using `for_each` in Resource Blocks
+
+### Refactored Example (List → Set)
+
+```hcl
+resource "aws_instance" "sandbox" {
+  ami           = var.ami
+  instance_type = var.instance_type
+  for_each      = toset(var.sandboxes)
+
+  tags = {
+    Name = each.value
+  }
+}
+```
+
+### Using a Set Variable
+
+```hcl
+variable "sandboxes" {
+  type    = set(string)
+  default = ["sandbox_one", "sandbox_two", "sandbox_three"]
+}
+```
+
+
+## Using `for_each` with Maps
+
+```hcl
+variable "sandboxes" {
+  type = map(object({
+    instance_type = string
+    tags          = map(string)
+  }))
+
+  default = {
+    sandbox_one = {
+      instance_type = "t2.small"
+      tags = { Name = "sandbox_one" }
+    }
+    sandbox_two = {
+      instance_type = "t2.micro"
+      tags = { Name = "sandbox_two" }
+    }
+    sandbox_three = {
+      instance_type = "t2.nano"
+      tags = { Name = "sandbox_three" }
+    }
+  }
+}
+```
+
+```hcl
+resource "aws_instance" "sandbox" {
+  ami           = var.ami
+  for_each      = var.sandboxes
+  instance_type = each.value.instance_type
+  tags          = each.value.tags
+}
+```
+
+
+## Using `for_each` in Data Blocks
+
+```hcl
+data "aws_instance" "test_server" {
+  for_each    = var.instance_ids
+  instance_id = each.value
+}
+```
+
+Resources can chain `for_each` when there is a one-to-one relationship.
+
+
+## Using `for_each` in Module Blocks
+
+```hcl
+module "virtual_servers" {
+  source   = "./modules/virtual_servers"
+  for_each = local.qa_instances
+  instance_type = each.value.instance_type
+}
+```
+
+
+## `for_each` with Dynamic Blocks
+
+```hcl
+resource "aws_security_group" "test_sg" {
+  dynamic "ingress" {
+    for_each = var.ingress_ports
+    content {
+      from_port = ingress.value
+      to_port   = ingress.value
+      protocol  = "tcp"
+    }
+  }
+}
+```
+
+
+## Referencing Resources with `for_each`
+
+- Resource: `aws_instance.example`
+- Instance: `aws_instance.example["sandbox_one"]`
+- Module: `module.virtual_servers["qa_server_1"]`
+
+
+## Limitations of `for_each`
+
+- Keys and values must be **known before apply**
+- Cannot use **sensitive values**
+- Cannot depend on impure functions like `timestamp()`
+
+
+## Expressions with `for_each`
+
+Transform complex structures using `for` expressions:
+
+```hcl
+locals {
+  flat_sandboxes = {
+    for sandbox in var.sandboxes :
+    sandbox.name => sandbox
+  }
+}
+```
+
+## Performance Considerations
+
+- `for_each` increases API calls
+- Use cautiously in large-scale environments
+
+## FAQ
+
+### When should I use `for_each`?
+When resources have **unique identities** and must avoid unintended changes.
+
+### Can I use both `count` and `for_each`?
+No. Only one meta-argument is allowed per block.
+
+
+## Conclusion
+
+Terraform introduced `for_each` to provide safer, clearer, and more maintainable infrastructure provisioning. While powerful, it should be used thoughtfully to avoid performance issues.
