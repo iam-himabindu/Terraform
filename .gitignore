@@ -2,7 +2,9 @@
 **/.terraform/*
 
 
-
+# Terraform state files
+*.tfstate
+*.tfstate.*
 
 
 
