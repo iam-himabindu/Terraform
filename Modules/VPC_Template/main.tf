@@ -15,12 +15,25 @@ resource "aws_internet_gateway" "gw" {
   }
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public1" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnet_cidr
-  availability_zone       = var.availability_zone
+  cidr_block              = var.subnet_1_cidr
+  availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = true
   tags = {
-    Name = "${var.env}-public-subnet"
+    Name = "${var.env}-public-subnet-1"
   }
 }
+
+resource "aws_subnet" "public2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.subnet_2_cidr
+  availability_zone       = var.availability_zone_2
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "${var.env}-public-subnet-2"
+  }
+}
+
+
+

@@ -11,10 +11,16 @@ variable "db_name" {
 }
 variable "db_user" {}
 variable "db_password" {}
+
 variable "db_sg_id" {
     type = string
     default = ""
     description = ""
 }
-variable "subnet_ids" {}
+variable "db_subnet_group_name" {
+  
+}
 variable "env" {}
+
+
+

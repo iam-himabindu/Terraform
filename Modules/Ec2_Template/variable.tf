@@ -10,11 +10,17 @@ variable "instance_type" {
     description = "passing the values of inttance type"
   
 }
-variable "subnet_id" {
+variable "subnet_1_id" {
   type = string
     default = ""
     description = "passing the values of subnet id"
 }
+
+# variable "subnet_2_id" {
+#   type = string
+#     default = ""
+#     description = "passing the values of subnet id"
+# }
 variable "key" {
     type = string
     default = ""
@@ -23,3 +29,4 @@ variable "key" {
 }
 
 variable "tags" {}
+

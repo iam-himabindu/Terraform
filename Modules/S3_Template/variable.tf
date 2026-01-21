@@ -3,6 +3,10 @@ variable "aws_s3_bucket" {
   type        = string
 }
 
+variable "force_destroy" {
+  
+}
+
 variable "acl" {
   description = "S3 bucket ACL"
   type        = string
