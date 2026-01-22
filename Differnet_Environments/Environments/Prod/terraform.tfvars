@@ -1,0 +1,7 @@
+vpc_cidr           = "10.0.0.0/16"
+public_subnet_cidr = "10.0.1.0/24"
+availability_zone  = "us-east-1b"
+instance_type      = "t3.micro"
+env                = "prod"
+ami_id             = "ami-07ff62358b87c7116"
+region             = "us-east-1"
